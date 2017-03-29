@@ -1,5 +1,4 @@
-# tf-rnn-attention
-Tensorflow implementation of attention mechanism for text classification tasks.
+# attention-sentiment
+My bachelor's degree thesis (with code and experiments) on sentiment classification of Russian texts using Bi-RNN with attention mechanism.
 
-The repo also provides my bachelor's degree thesis (with code and experiments) on sentiment analysis of russian texts using RNN with attention mechanism.
-
+Contains Attention mechanism implemented using Tensorflow.
