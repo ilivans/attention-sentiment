@@ -1,26 +1,30 @@
 \documentclass{beamer}
+\usepackage[backend=bibtex]{biblatex}
 \usepackage[utf8]{inputenc}
 \usepackage[russian]{babel}
 \usepackage{amsmath,mathrsfs,mathtext}
 \usepackage{graphicx, epsfig}
 \usepackage{color}
+\usepackage{xcolor}
 \usetheme{Warsaw}%{Singapore}%{Warsaw}%{Warsaw}%{Darmstadt}
 \usecolortheme{sidebartab}
 \definecolor{beamer@blendedblue}{RGB}{15,120,80}
+
+\usepackage{multirow}
+
 %----------------------------------------------------------------------------------------------------------
 \title[\hbox to 56mm{\hfill\insertframenumber\,/\,\inserttotalframenumber}]
-{Анализ тональности русскоязычных текстов\\
-при помощи рекуррентных нейронных сетей\\
-с механизмом внимания}
-\author[И.\,С. Иванов]{\large \\Илья Сергеевич Иванов\\
-{\small Научный руководитель к.ф.-м.н. Михаил Бурцев}}
-\institute{\large
-Московский физико-технический институт\\
-Факультет Инноваций и Высоких Технологий\\
-Кафедра Анализа Данных}
+{Рекуррентные нейронные сети с механизмом внимания для анализа тональности русских текстов}
+\author[И.\,С. Иванов]{\large \\Иванов Илья Сергеевич$^{1}$
+{\large \\Ботвиновский Евгений Александрович$^{2}$}}
+\institute{
+$^{1}$студент, Московский Физико-Технический Институт\\
+$^{2}$к.ф.-м.н., DeepHackLab\\
+}
 \date{2017}
 %----------------------------------------------------------------------------------------------------------
 \begin{document}
+\nocite{*}
 %----------------------------------------------------------------------------------------------------------
 \begin{frame}
 %\thispagestyle{empty}
@@ -28,7 +32,7 @@
 \end{frame}
 %-----------------------------------------------------------------------------------------------------
 \begin{frame}{Цель исследования}
-Исследовать новые методы анализа тональности коротких текстов на русском языке с применением рекуррентных нейронных сетей и механизма внимания.
+Исследовать новые методы анализа тональности текстов на русском языке с применением рекуррентных нейронных сетей и механизма внимания.
 \begin{block}{Проблемы}
 	Сложная морфология русского языка.\\
 	Особенности лексикона пользователей соц. сети.\\
@@ -52,11 +56,11 @@
 %----------------------------------------------------------------------------------------------------------
 \begin{frame}{Постановка задачи классификации}
 	\begin{block}{}
-        Дано множество коротких сообщений $\mathfrak{D} = \{\mathbf{d}_j\}_{j=1}^{K}$, относящихся к компании(-ям).
+        Дано множество текстов (документов) $\mathfrak{D} = \{\mathbf{d}_i\}_{i=1}^{n}$.
 	\end{block}    
     
     \begin{block}{}
-        Необходимо классифицировать сообщения из $\mathfrak{D}$ на три класса:
+        Необходимо классифицировать документы из $\mathfrak{D}$ на три класса:
         	\begin{enumerate}
 			\item положительной тональности (положительные);
 			\item отрицательной тональности (отрицательные);
@@ -65,16 +69,19 @@
 	\end{block}
 	
 	\begin{block}{Функционалы качества}
-		Макро-усредненная F-мера
-относительно классов положительных и
-отрицательных сообщений.
+		\begin{enumerate}
+			\item Точность (accuracy)
+			\item Макро-усредненная F-мера
+			относительно классов положительных и
+			отрицательных сообщений.
+		\end{enumerate}
 	\end{block}
 	В качестве классификатора предлагается использовать двунаправленную рекуррентную нейронную сеть с механизмом внимания.
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
 \begin{frame}{Векторное представление слов}
 	\begin{itemize}
-	\item Сообщение $\mathbf{d}\in\mathfrak{D}$ является последовательностью слов $\mathbf{d}=\mathbf{w}_1..\mathbf{w}_T$ из словаря $\mathfrak{W}$.\\
+	\item Документ $\mathbf{d}\in\mathfrak{D}$ является последовательностью слов $\mathbf{d}=\mathbf{w}_1..\mathbf{w}_T$ из словаря $\mathfrak{W}$.\\
 	\item Слово $\mathbf{w}\in\mathfrak{W}$ представляется вектором в $D$-мерном пространстве.\\
 	\item Векторное представление для всех слов из словаря получается при помощи алгоритма Word2Vec, применённом на большом наборе неразмеченных данных.
 	\end{itemize}
@@ -112,7 +119,7 @@
 
 	\end{block}
 \begin{figure}[!h]
-  \includegraphics[width=0.5\textwidth]{images/birnn.png}
+  \includegraphics[width=0.3\textwidth]{images/birnn2_bin.png}
 \end{figure}
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
@@ -121,50 +128,48 @@
 	\begin{align}
 	\upsilon_{t}&=\tanh{(W_{\omega}\left[\overrightarrow{h_{t}},\overleftarrow{h_{t}}\right]+b_{\omega})}\\
 	\alpha_{t}&=\frac{\exp{(\upsilon_{t}^{T}u_{\omega})}}{\sum_{j=1}^{T}\exp{(\upsilon_{j}^{T}u_{\omega})}}\\
-	\upsilon&=\sum_{t=1}^{T}\alpha_{t}h_{t}
+	\upsilon&=\sum_{t=1}^{T}\alpha_{t}\left[\overrightarrow{h_{t}},\overleftarrow{h_{t}}\right]
 	\end{align}	
 	\end{block}
 \begin{figure}[!h]
-  \includegraphics[width=0.25\textwidth]{images/attention.png}
+  \includegraphics[width=0.25\textwidth]{images/att_edited.png}
 \end{figure}
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
-\begin{frame}{Набор данных}
-	В качестве коллекции документов $\mathfrak{D}$ используется набор сообщений пользователей соц. сети Twitter с упоминанием некоторых банков и телекоммуникационных компаний, собираемые с 2013-го года. Особенностями данной коллекции являются:
-	\begin{itemize}
-	\item Размер сообщения - не более 140 символов
-	\item Лексикон:
+\begin{frame}{Наборы данных}
+	В качестве коллекции документов $\mathfrak{D}$ используются следующие наборы данных:
+	\begin{enumerate}
+	\item Сообщения пользователей соц. сети Twitter с упоминанием некоторых банков и телекоммуникационных компаний:
 		\begin{itemize}
-			 \item сленг
-			 \item сокращения
-			 \item эмотиконы		
+		\item Размер выборки - около 10 тыс. экземпляров
+		\item Размер сообщения - не более 140 символов
+		\item Лексикон: сленг, сокращения, эмотиконы
+		\item Спец. символы: \# (хэштег), @ (ссылка на пользователя)
+		\item Ссылки на внешние ресурсы
 		\end{itemize}
-	\item Спец. символы:
+	\item Отзывы на товары и рестораны:
 		\begin{itemize}
-			 \item \# (хэштег)
-			 \item @ (ссылка на пользователя)
+		\item Размер выборки - около 70 тыс. экземпляров
+		\item Размер сообщения - до 150 слов
 		\end{itemize}
-	\item Ссылки на внешние ресурсы
-	\end{itemize}
+	\end{enumerate}
 \end{frame}
 %-----------------------------------------------------------------------------------------------
 \begin{frame}{Цели эксперимента}
 	\begin{enumerate}
 		\item Реализовать архитектуру двунаправленной рекуррентной сети с механизмом внимания (Python + TensorFlow)
-		\item Провести подбор оптимальных гиперпараметров (GridSearch)
+		\item Обучить модель на предложенных выборках
 		\item Сравнить результаты с предложенными ранее алгоритмами.
 	\end{enumerate}
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
 \begin{frame}{Вычислительный эксперимент}
-В ходе эксперимента сравниваются результаты предложенного алгоритма классификации с такими алгоритмами как двунаправленная рекуррентная нейронная сеть (без механизма внимания) и метод опорных векторов. \\
+В ходе эксперимента сравниваются результаты предложенного алгоритма классификации с такими алгоритмами как двунаправленная рекуррентная нейронная сеть (без механизма внимания), метод опорных векторов и другие. \\
 \begin{block}{План эксперимента}
 	\begin{enumerate}
-		\item Предобработать набор текстов
-		\item Обучить Word2Vec
-		\item Реализовать двунаправленный GRU
-		\item Реализовать механизм внимания
-		\item Подобрать оптимальные параметры модели на обучающей выборке
+		\item Предобработать наборы текстов
+		\item Реализовать двунаправленный GRU с механизмом внимания
+		\item Провести подбор оптимальных гиперпараметров и обучить модель на обучающей выборке
 		\item Протестировать модель на отложенной выборке
 		\item Сравнить результаты с другими алгоритмами
 	\end{enumerate}
@@ -181,14 +186,129 @@
 	
 \end{enumerate}
 \end{frame}
+
 %----------------------------------------------------------------------------------------------------------
 \begin{frame}{Предобработка данных}
 
 \begin{figure}[!h]
 \caption{Распределение кол-ва слов в сообщении}
-  \includegraphics[width=0.5\textwidth]{images/mess_len_bank.png}
-    \includegraphics[width=0.5\textwidth]{images/mess_len_tkk2.png}
+\includegraphics[width=0.45\textwidth]{images/mess_len_bank.png}
+\includegraphics[width=0.45\textwidth]{images/mess_len_tkk2.png}
+\\
+\includegraphics[width=0.45\textwidth]{images/mess_len_reviews.png}
 \end{figure}
+
+\end{frame}
+%----------------------------------------------------------------------------------------------------------
+\begin{frame}{Визуализация механизма внимания}
+
+%\colorbox{yellow!0}{Вчера}
+%\colorbox{yellow!0}{был}
+%\colorbox{yellow!0}{в}
+%\colorbox{yellow!0}{центральном}
+%\colorbox{yellow!0}{офисе}
+%\colorbox{yellow!3}{сбербанка}
+%\colorbox{yellow!8}{в}
+%\colorbox{yellow!14}{Волгограде.}
+%\colorbox{yellow!42}{Уж}
+%\colorbox{yellow!47}{насколько}
+%\colorbox{yellow!89}{я}
+%\colorbox{yellow!100}{его}
+%\colorbox{yellow!67}{не}
+%\colorbox{yellow!53}{люблю,}
+%\colorbox{yellow!29}{но}
+%\colorbox{yellow!26}{настолько}
+%\colorbox{yellow!14}{был}
+%\colorbox{yellow!13}{вчера}
+%\colorbox{yellow!6}{удивлен}
+%\colorbox{yellow!4}{что}
+%\colorbox{yellow!12}{грех}
+%\colorbox{yellow!4}{не}
+%\colorbox{yellow!2}{похвалить.}
+1.
+\colorbox{yellow!70}{Почему-то}
+\colorbox{yellow!100}{не}
+\colorbox{yellow!57}{приходят}
+\colorbox{yellow!17}{смс-сообщения}
+\colorbox{yellow!5}{для}
+\colorbox{yellow!7}{подтверждения}
+\colorbox{yellow!0}{входа}
+\linebreak
+2.
+\colorbox{yellow!3}{IPhone-овское}
+\colorbox{yellow!2}{приложение}
+\colorbox{yellow!2}{от}
+\colorbox{yellow!30}{Сбербанка}
+\colorbox{yellow!89}{самое}
+\colorbox{yellow!100}{удобное}
+\colorbox{yellow!84}{в}
+\colorbox{yellow!82}{России}
+\linebreak
+%\colorbox{yellow!100}{Отказ}
+%\colorbox{yellow!80}{Сбербанка}
+%\colorbox{yellow!56}{от}
+%\colorbox{yellow!44}{Про100}
+%\colorbox{yellow!24}{может}
+%\colorbox{yellow!24}{создать}
+%\colorbox{yellow!27}{проблемы}
+%\colorbox{yellow!7}{для}
+%\colorbox{yellow!13}{жителей}
+%\colorbox{yellow!43}{Крыма}
+
+%\colorbox{yellow!3}{@RSHBmedia}
+%\colorbox{yellow!87}{почему}
+%\colorbox{yellow!100}{такой}
+%\colorbox{yellow!69}{неудобный}
+%\colorbox{yellow!71}{и}
+%\colorbox{yellow!69}{не}
+%\colorbox{yellow!68}{информативный}
+%\colorbox{yellow!3}{интернет-}
+%\colorbox{yellow!3}{банк?}
+%\colorbox{yellow!8}{Учитесь}
+%\colorbox{yellow!16}{у}
+%\colorbox{yellow!3}{@sberbank}
+%\colorbox{yellow!17}{и}
+%\colorbox{yellow!12}{его}
+%\colorbox{yellow!19}{Сбербанк-}
+%\colorbox{yellow!1}{онлайн.}
+3.
+\colorbox{yellow!14}{Заведение}
+\colorbox{yellow!41}{вполне}
+\colorbox{yellow!62}{приличное,}
+\colorbox{yellow!78}{кухня}
+\colorbox{yellow!99}{хорошая,}
+\colorbox{yellow!27}{но}
+\colorbox{yellow!25}{маловато}
+\colorbox{yellow!11}{выбора,}
+\colorbox{yellow!8}{зато}
+\colorbox{yellow!2}{с}
+\colorbox{yellow!2}{напитками}
+\colorbox{yellow!2}{никакой}
+\colorbox{yellow!2}{проблемы}
+\colorbox{yellow!3}{выбора}
+\colorbox{yellow!2}{нет!!}
+\colorbox{yellow!2}{много}
+\colorbox{yellow!2}{сортов}
+\colorbox{yellow!2}{пива}
+\colorbox{yellow!3}{и}
+\colorbox{yellow!2}{других}
+\colorbox{yellow!1}{более}
+\colorbox{yellow!2}{крепких}
+\colorbox{yellow!1}{напитков.}
+\colorbox{yellow!1}{из}
+\colorbox{yellow!3}{минусов}
+\colorbox{yellow!3}{можно}
+\colorbox{yellow!4}{сказать}
+\colorbox{yellow!4}{только}
+\colorbox{yellow!10}{черезмерная}
+\colorbox{yellow!8}{громкость}
+\colorbox{yellow!12}{живой}
+\colorbox{yellow!8}{музыки}
+\colorbox{yellow!4}{по}
+\colorbox{yellow!5}{выходным.}
+\colorbox{yellow!6}{соседа}
+\colorbox{yellow!11}{не}
+\colorbox{yellow!11}{слышно....}
 
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
@@ -196,19 +316,23 @@
 
 \begin{table}[]
 \centering
-\caption{Результаты моделей на 5-фолд кросс-валидации}
-\label{tab:cv}
-\begin{tabular}{l|l|l|}
-\cline{2-3}
-                                                                                                              & \multicolumn{1}{c|}{Banks}    & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Telecommunication\\ companies\end{tabular}} \\ \cline{2-3} 
-                                                                                                              & \multicolumn{1}{c|}{F1-score} & \multicolumn{1}{c|}{F1-score}                                                              \\ \hline
-\multicolumn{1}{|l|}{Bi-GRU}                                                                                  & 0.740                         & 0.625                        \\ \hline
-\multicolumn{1}{|l|}{Bi-GRU + Attention}                                                                      & 0.737                         & 0.609                         \\ \hline
-\multicolumn{1}{|l|}{\begin{tabular}[c]{@{}l@{}}2-layer GRU,\\ reversed sequences\\ (Arhipenko)\end{tabular}}
-& 0.621                        & 0.660                                        \\ \hline
-\multicolumn{1}{|l|}{Bi-GRU (Arhipenko)}                                                                      & 0.621                       & 0.652                         \\ \hline
-\multicolumn{1}{|l|}{LSTM (Arhipenko)}                                                                      & 0.603                       & 0.641                         \\ \hline
+\caption{F1-мера различных моделей на кросс-валидации (CV) и на тестовой выборке для выборок с твитами}
+\label{tab:res}
+{\small
+\begin{tabular}{l|l|l|l|l|}
+\cline{2-5}
+                                                                                                              & \multicolumn{2}{c|}{Banks}   & \multicolumn{2}{c|}{\begin{tabular}[c]{@{}c@{}}Telecommunication\\ companies\end{tabular}} \\ \cline{2-5}                                                                                                               
+                                                                                                              & \begin{tabular}[c]{@{}l@{}}5-fold CV\\(mean, std)\end{tabular}  & test & \begin{tabular}[c]{@{}l@{}}5-fold CV\\(mean, std)\end{tabular}                                & test                                \\ \hline
+\multicolumn{1}{|l|}{Bi-GRU}                                                                                  & 0.74, 0.02            & 0.48 & 0.62, 0.01                                                     & 0.52                                \\ \hline
+\multicolumn{1}{|l|}{Bi-GRU + Attention}                                                                      & 0.74, 0.02            & 0.51 & 0.60, 0.02                                           & 0.49                                \\ \hline
+\multicolumn{1}{|l|}{\begin{tabular}[c]{@{}l@{}}2-layer GRU,\\ reversed sequences\\ (Arhipenko)\end{tabular}} & 0.62, -               & 0.55 & 0.66, -                                              & 0.56                                \\ \hline
+\multicolumn{1}{|l|}{Bi-GRU (Arhipenko)}                                                                      & 0.62, -               & -    & 0.65, -                                              & -                                   \\ \hline
+\multicolumn{1}{|l|}{LSTM (Arhipenko)}                                                                        & 0.60, -               & -    & 0.64, -                                              & -                                   \\ \hline
+\multicolumn{1}{|l|}{CNN (Arhipenko)}                                                                         & -                     & 0.48 & -                                                    & 0.47                                \\ \hline
+\multicolumn{1}{|l|}{SVM baseline}                                                                            & -                     & 0.46 & -                                                    & 0.46                                \\ \hline
+\multicolumn{1}{|l|}{Majority baseline}                                                                       & -                     & 0.31 & -                                                    & 0.19                                \\ \hline
 \end{tabular}
+}
 \end{table}
 
 \end{frame}
@@ -216,20 +340,38 @@
 \begin{frame}{Сравнение качества полученных моделей}
 
 \begin{table}[]
+
 \centering
-\caption{Результаты моделей на тестовой выборке}
-\label{tab:test}
-\begin{tabular}{l|l|l|}
-\cline{2-3}
-                                                                                                              & \multicolumn{1}{c|}{Banks}    & \multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Telecommunication\\ companies\end{tabular}} \\ \cline{2-3} 
-                                                                                                              & \multicolumn{1}{c|}{F1-score} & \multicolumn{1}{c|}{F1-score}                                                              \\ \hline
-\multicolumn{1}{|l|}{Bi-GRU}                                                                                  & 0.48                          & 0.52                                                                                       \\ \hline
-\multicolumn{1}{|l|}{Bi-GRU + Attention}                                                                      & 0.51                          & 0.49                                                                                       \\ \hline
-\multicolumn{1}{|l|}{\begin{tabular}[c]{@{}l@{}}2-layer GRU,\\ reversed sequences\\ (Arhipenko)\end{tabular}} & 0.55                          & 0.56                                                                                       \\ \hline
-\multicolumn{1}{|l|}{CNN (Arhipenko)}                                                                      & 0.48                          & 0.47                                                                                       \\ \hline
-\multicolumn{1}{|l|}{SVM baseline}                                                                      & 0.46                          & 0.46                                                                                       \\ \hline
-\multicolumn{1}{|l|}{Majority baseline}                                                                      & 0.31                          & 0.19                                                                                       \\ \hline
+\caption{Результаты эксперимента со смешиванием обучающей и тестовой выборок}
+\label{tab:mix}
+\setlength\tabcolsep{1.5pt}
+{\small
+\begin{tabular}{l|c|l|l|c|l|l|}
+\cline{2-7}
+                                         & \multicolumn{3}{c|}{Banks}                                                                                     & \multicolumn{3}{c|}{\begin{tabular}[c]{@{}c@{}}Telecommunication\\ companies\end{tabular}}                     \\ \cline{2-7} 
+                                         & \multicolumn{2}{c|}{cross-validation}                             & \multicolumn{1}{c|}{\multirow{2}{*}{test}} & \multicolumn{2}{c|}{cross-validation}                             & \multicolumn{1}{c|}{\multirow{2}{*}{test}} \\ \cline{2-3} \cline{5-6}
+                                         & train                           & \multicolumn{1}{c|}{train+test} & \multicolumn{1}{c|}{}                      & train                           & \multicolumn{1}{c|}{train+test} & \multicolumn{1}{c|}{}                      \\ \hline
+\multicolumn{1}{|l|}{Bi-GRU}             & \multicolumn{1}{l|}{0.74, 0.02} & 0.71, 0.02                      & 0.48                                       & \multicolumn{1}{l|}{0.62, 0.01} & 0.62, 0.01                      & 0.52                                       \\ \hline
+\multicolumn{1}{|l|}{Bi-GRU+Attention} & \multicolumn{1}{l|}{0.74, 0.02} & 0.72, 0.01                      & 0.51                                       & \multicolumn{1}{l|}{0.60, 0.02} & 0.62, 0.01                      & 0.49                                       \\ \hline
 \end{tabular}
+}
+\end{table}
+
+\end{frame}
+%----------------------------------------------------------------------------------------------------------
+\begin{frame}{Сравнение качества полученных моделей}
+\begin{table}[]
+	\centering
+	\caption{Качество различных моделей на кросс-валидации (CV) и на тестовой выборке для выборки с отзывами}
+	\label{tab:res2}
+	\begin{tabular}{l|c|l|l|l|}
+		\cline{2-5}
+		& \multicolumn{4}{c|}{Reviews}                                                                                          \\ \cline{2-5} 
+		& \multicolumn{2}{c|}{10-fold CV (mean, std)}                             & \multicolumn{2}{c|}{test}                               \\ \cline{2-5} 
+		& Accuracy                          & \multicolumn{1}{c|}{F1} & \multicolumn{1}{c|}{Accuracy} & \multicolumn{1}{c|}{F1} \\ \hline
+		\multicolumn{1}{|l|}{Bi-GRU}           & \multicolumn{1}{l|}{0.906, 0.003} & 0.863, 0.007            & 0.901                         & 0.861                   \\ \hline
+		\multicolumn{1}{|l|}{Bi-GRU+Attention} & \multicolumn{1}{l|}{0.907, 0.004} & 0.865, 0.007            & 0.900                         & 0.861                   \\ \hline
+	\end{tabular}
 \end{table}
 
 \end{frame}
@@ -237,13 +379,14 @@
 \begin{frame}{Заключение}
 
 	\begin{itemize}
-		\item Реализован алгоритм двунаправленной рекуррентной нейронной сети с механизмом внимания для классификации тональности коротких русскоязычных текстов. Код отлажен и выложен в открытый доступ
-		\item Проведён поиск оптимальных гиперпараметров алгоритма
+		\item Реализован алгоритм двунаправленной рекуррентной нейронной сети с механизмом внимания для классификации тональности русскоязычных текстов. Код отлажен и выложен в открытый доступ
+		\item Проведён подбор гиперпараметров и обучены модели на вышеупомянутых выборках
 		\item Проведено сравнение результатов с предложенными ранее алгоритмами
 		\item Подготовлен отчет по результатам работы
 	\end{itemize}
 
 	\begin{block}{Дальнейшее исследование}
+		Проведение экспериментов на других наборах данных.\\
 		Исследование применимости данной модели в качестве модуля для нейронной сети, генерирующей сообщения с заданной тональностью.
 	\end{block}
 \end{frame}
