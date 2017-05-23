@@ -16,10 +16,12 @@
 \title[\hbox to 56mm{\hfill\insertframenumber\,/\,\inserttotalframenumber}]
 {Рекуррентные нейронные сети с механизмом внимания для анализа тональности русских текстов}
 \author[И.\,С. Иванов]{\large \\Иванов Илья Сергеевич$^{1}$
-{\large \\Ботвиновский Евгений Александрович$^{2}$}}
+\large \\Ботвиновский Евгений Александрович$^{2}$
+\large \\Бурцев Михаил Сергеевич$^{3}$}
 \institute{
 $^{1}$студент, Московский Физико-Технический Институт\\
 $^{2}$к.ф.-м.н., DeepHackLab\\
+$^{3}$к.ф.-м.н., DeepHackLab\\
 }
 \date{2017}
 %----------------------------------------------------------------------------------------------------------
@@ -79,16 +81,16 @@ $^{2}$к.ф.-м.н., DeepHackLab\\
 	В качестве классификатора предлагается использовать двунаправленную рекуррентную нейронную сеть с механизмом внимания.
 \end{frame}
 %----------------------------------------------------------------------------------------------------------
-\begin{frame}{Векторное представление слов}
-	\begin{itemize}
-	\item Документ $\mathbf{d}\in\mathfrak{D}$ является последовательностью слов $\mathbf{d}=\mathbf{w}_1..\mathbf{w}_T$ из словаря $\mathfrak{W}$.\\
-	\item Слово $\mathbf{w}\in\mathfrak{W}$ представляется вектором в $D$-мерном пространстве.\\
-	\item Векторное представление для всех слов из словаря получается при помощи алгоритма Word2Vec, применённом на большом наборе неразмеченных данных.
-	\end{itemize}
-\begin{figure}[!h]
-  \includegraphics[width=1.0\textwidth]{images/word2vec.png}
-\end{figure}
-\end{frame}
+%\begin{frame}{Векторное представление слов}
+%	\begin{itemize}
+%	\item Документ $\mathbf{d}\in\mathfrak{D}$ является последовательностью слов $\mathbf{d}=\mathbf{w}_1..\mathbf{w}_T$ из словаря $\mathfrak{W}$.\\
+%	\item Слово $\mathbf{w}\in\mathfrak{W}$ представляется вектором в $D$-мерном пространстве.\\
+%	\item Векторное представление для всех слов из словаря получается при помощи алгоритма Word2Vec, применённом на большом наборе неразмеченных данных.
+%	\end{itemize}
+%\begin{figure}[!h]
+%  \includegraphics[width=1.0\textwidth]{images/word2vec.png}
+%\end{figure}
+%\end{frame}
 %----------------------------------------------------------------------------------------------------------
 \begin{frame}{Рекуррентная нейронная сеть}
 	\begin{itemize}
@@ -316,7 +318,7 @@ $^{2}$к.ф.-м.н., DeepHackLab\\
 
 \begin{table}[]
 \centering
-\caption{F1-мера различных моделей на кросс-валидации (CV) и на тестовой выборке для выборок с твитами}
+\caption{F1-мера различных моделей на кросс-валидации (CV) и тестовой подвыборке для набора с твитами}
 \label{tab:res}
 {\small
 \begin{tabular}{l|l|l|l|l|}
@@ -362,15 +364,17 @@ $^{2}$к.ф.-м.н., DeepHackLab\\
 \begin{frame}{Сравнение качества полученных моделей}
 \begin{table}[]
 	\centering
-	\caption{Качество различных моделей на кросс-валидации (CV) и на тестовой выборке для выборки с отзывами}
+	\caption{Качество различных моделей на кросс-валидации (CV) и тестовой подвыборке для набора с отзывами}
 	\label{tab:res2}
-	\begin{tabular}{l|c|l|l|l|}
+	\begin{tabular}{l|l|l|l|l|}
 		\cline{2-5}
-		& \multicolumn{4}{c|}{Reviews}                                                                                          \\ \cline{2-5} 
-		& \multicolumn{2}{c|}{10-fold CV (mean, std)}                             & \multicolumn{2}{c|}{test}                               \\ \cline{2-5} 
-		& Accuracy                          & \multicolumn{1}{c|}{F1} & \multicolumn{1}{c|}{Accuracy} & \multicolumn{1}{c|}{F1} \\ \hline
-		\multicolumn{1}{|l|}{Bi-GRU}           & \multicolumn{1}{l|}{0.906, 0.003} & 0.863, 0.007            & 0.901                         & 0.861                   \\ \hline
-		\multicolumn{1}{|l|}{Bi-GRU+Attention} & \multicolumn{1}{l|}{0.907, 0.004} & 0.865, 0.007            & 0.900                         & 0.861                   \\ \hline
+		& \multicolumn{4}{c|}{Reviews}                                                                                      \\ \cline{2-5} 
+		& \multicolumn{2}{c|}{10-fold CV}                         & \multicolumn{2}{c|}{test}                               \\ \cline{2-5} 
+		& \multicolumn{1}{c|}{accuracy} & \multicolumn{1}{c|}{F1} & \multicolumn{1}{c|}{accuracy} & \multicolumn{1}{c|}{F1} \\ \hline
+		\multicolumn{1}{|l|}{Bi-GRU}           & 0.906, 0.003                  & 0.863, 0.007            & 0.901                         & 0.861                   \\ \hline
+		\multicolumn{1}{|l|}{Bi-GRU+Attention} & 0.907, 0.004                  & 0.865, 0.007            & 0.900                         & 0.861                   \\ \hline
+		\multicolumn{1}{|l|}{CNN}              & 0.901, 0.003                  & 0.854, 0.005            & 0.896                         & 0.844                   \\ \hline
+		\multicolumn{1}{|l|}{SVM}              & 0.897, 0.004                  & 0.838, 0.006            & 0.895                         & 0.836                   \\ \hline
 	\end{tabular}
 \end{table}
 
