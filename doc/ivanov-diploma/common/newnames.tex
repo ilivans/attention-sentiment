@@ -1,0 +1,79 @@
+% Новые переменные, которые могут использоваться во всём проекте
+\newcommand{\authorbibtitle}{Публикации автора по теме диссертации}
+\newcommand{\fullbibtitle}{Список литературы} % (ГОСТ Р 7.0.11-2011, 4)
+
+% I fucking cannot format this 'if' properly because
+% of fucking spacing issues
+\newcommand{\CH}[1][]{\ifthenelse{ \equal{#1}{*} }
+        {\texttt{CascadeHeap*}}
+        {\ifthenelse{ \equal{#1}{} }
+            {\texttt{CascadeHeap}}
+            {\texttt{CascadeHeap[#1]}}}\xspace}
+
+\newcommand{\SCH}{\texttt{SimpleCascadeHeap}\xspace}
+\newcommand{\myB}{\texttt{B}\xspace}
+\newcommand{\MH}[1][]{\ifthenelse{ \equal{#1}{} }
+        {\texttt{MH}}
+        {\texttt{MH$_{#1}$}}\xspace}
+\newcommand{\HH}{\texttt{HH}\xspace}
+
+\newcommand{\PartSort}{\texttt{PartialSorting}\xspace}
+\newcommand{\IncSort}{\texttt{IncrementalSorting}\xspace}
+\newcommand{\PriQ}{\texttt{PriorityQueue}\xspace}
+
+% Theorems
+\newtheorem*{theorem-star}{Теорема}
+\newtheorem{theorem}{Теорема}[section]
+\newtheorem*{theorem-definition-star}{Теорема-определение}
+\newtheorem*{corollary-star}{Следствие}
+\newtheorem{corollary}{Следствие}[section]
+\newtheorem*{property-star}{Свойство}
+\newtheorem*{properties}{Свойства}
+\newtheorem{property}{Свойство}
+\newtheorem*{lem-star}{Лемма}
+\newtheorem{lem}{Лемма}[section]
+\newtheorem*{proposition-star}{Предложение}
+\newtheorem{proposition}{Предложение}
+\newtheorem{stage}{Этап}
+\newtheorem*{statement}{Утверждение}
+\newtheorem*{usage}{Использование}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Замечание}
+
+\theoremstyle{definition}
+\newtheorem{problem}{Задача}
+\newtheorem{exercise}{Упражнение}
+
+\theoremstyle{definition}
+\newtheorem*{definition-star}{Определение}
+\newtheorem{definition}{Определение}[section]
+\newtheorem*{designation}{Обозначение}
+
+\theoremstyle{definition}
+\newtheorem*{example-star}{Пример}
+\newtheorem{example}{Пример}
+\newtheorem*{examples}{Примеры}
+\newtheorem{case}{Случай}
+\newtheorem*{case-star}{Случай}
+
+\newcommand{\myX}{\mathcal{X}}
+\newcommand{\myH}{\mathcal{H}}
+
+\DeclareMathOperator{\lev}{level}
+
+% algorihtm2e stuff
+\newcommand{\DefineAlgoKeywords}{
+\SetKwArray{BalState}{BalancingState}
+\SetKwArray{T}{T}
+\SetKwData{BufSize}{BufferSize}
+\SetKwData{C}{C}
+\SetKwData{ElemCount}{InsertionsCount}
+\SetKwData{NoAction}{NoAction}
+\SetKwData{StateI}{State1}
+\SetKwData{StateII}{State2}
+\SetKwData{x}{x}
+\SetKwData{MaxLevel}{MaximumLevel}
+}
+\newcommand{\Gets}{\ $\gets$\ }
+
